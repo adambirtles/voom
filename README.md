@@ -171,8 +171,11 @@ In the following instructions, the value of <var>X</var> depends on its mode:
 - Immediate: <var>X</var> is the two-byte operand following the instruction.
 - Direct: The operand is a pointer to <var>X</var> in memory.
 
+For instructions' direct mode, their mnemonics are appended with `m` (e.g.
+immediate `add` and direct `addm`).
+
 Unless it's affected by the instruction, <var>P</var> is increased by 3 after
-each of the folowing instructions.
+each of the following instructions.
 
 #### Set (immediate only)
 
