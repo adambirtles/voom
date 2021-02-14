@@ -27,7 +27,8 @@ Instructions are made up of a 1-byte opcode, and zero or one 2-byte operands.
 | Opcode bits | Category                                        | Operands |
 |:-----------:|:------------------------------------------------|:--------:|
 | `00__ ____` | Implicit                                        | 0        |
-| `1m__ ____` | Immediate (`m` = `0`) and direct (`m` = `1`)    | 1        |
+| `01__ __xx` | Compact                                         | 0        |
+| `1___ ___m` | Immediate (`m` = `0`) and direct (`m` = `1`)    | 1        |
 
 Any unlisted opcodes are undefined and reserved for future use.
 
@@ -45,8 +46,8 @@ each implicit instruction.
 
 #### No-op
 
-**Mnemonic:** `nop`<br>
-**Opcode:**
+Mnemonic: `nop`<br>
+Opcode: `0x00`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -54,21 +55,10 @@ each implicit instruction.
 
 Does nothing.
 
-#### Halt
-
-**Mnemonic:** `halt`<br>
-**Opcode:**
-
-| A | P | h | t | c | o |
-|:-:|:-:|:-:|:-:|:-:|:-:|
-| — | — | 1 | — | — | — |
-
-Set the halt flag, halting execution of the program.
-
 #### Test carry
 
-**Mnemonic:** `tc`<br>
-**Opcode:**
+Mnemonic: `tc`<br>
+Opcode: `0x01`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -78,8 +68,8 @@ Checks if the carry flag is set.
 
 #### Test signed overflow
 
-**Mnemonic:** `to`<br>
-**Opcode:**
+Mnemonic: `to`<br>
+Opcode: `0x02`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -89,8 +79,8 @@ Checks if the signed overflow flag is set.
 
 #### Invert test
 
-**Mnemonic:** `inv`<br>
-**Opcode:**
+Mnemonic: `inv`<br>
+Opcode: `0x03`
 
 | A | P | h | t  | c | o |
 |:-:|:-:|:-:|:--:|:-:|:-:|
@@ -98,32 +88,10 @@ Checks if the signed overflow flag is set.
 
 Inverts the test flag, working as a NOT operation on the previous test.
 
-#### Increment
-
-**Mnemonic:** `inc`<br>
-**Opcode:**
-
-|   A   | P | h | t | c | o |
-|:-----:|:-:|:-:|:-:|:-:|:-:|
-| A + 1 | — | — | — | — | — |
-
-Increments the accumulator.
-
-#### Decrement
-
-**Mnemonic:** `dec`<br>
-**Opcode:**
-
-|   A   | P | h | t | c | o |
-|:-----:|:-:|:-:|:-:|:-:|:-:|
-| A − 1 | — | — | — | — | — |
-
-Decrements the accumulator.
-
 #### Bitwise NOT
 
-**Mnemonic:** `not`<br>
-**Opcode:**
+Mnemonic: `not`<br>
+Opcode: `0x04`
 
 | A  | P | h | t | c | o |
 |:--:|:-:|:-:|:-:|:-:|:-:|
@@ -133,8 +101,8 @@ Performs a bitwise NOT on the accumulator.
 
 #### Negate
 
-**Mnemonic:** `neg`<br>
-**Opcode:**
+Mnemonic: `neg`<br>
+Opcode: `0x05`
 
 | A  | P | h | t | c | o |
 |:--:|:-:|:-:|:-:|:-:|:-:|
@@ -142,25 +110,92 @@ Performs a bitwise NOT on the accumulator.
 
 Converts the accumulator to its two's complement negative.
 
+#### Halt
+
+Mnemonic: `halt`<br>
+Opcode: `0x3F`
+
+| A | P | h | t | c | o |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| — | — | 1 | — | — | — |
+
+Set the halt flag, halting execution of the program.
+
+### Compact
+
+Compact instructions do not take a separate operand but stealthily hide an
+"operand" in the last two bits of the opcode. This "operand" is generally
+number of times that the action should be repeated (not including the first).
+
+In the following descriptions <var>X</var> is the value of the last two bits
+of the opcode plus 1. The `#` in the mnemonics refers to <var>X</var>, except
+for when <var>X</var> 1, in which case it is blank (e.g. `inc` and `inc2`).
+
+#### Increment
+
+Mnemonic: `inc#`<br>
+Opcodes: `0100 00xx` (`0x40`–`0x43`)
+
+|   A   | P | h | t | c | o |
+|:-----:|:-:|:-:|:-:|:-:|:-:|
+| A + X | — | — | — | — | — |
+
+Increments the accumulator by <var>X</var>.
+
+#### Decrement
+
+Mnemonic: `dec#`<br>
+Opcodes: `0100 01xx` (`0x44`–`0x47`)
+
+|   A   | P | h | t | c | o |
+|:-----:|:-:|:-:|:-:|:-:|:-:|
+| A − X | — | — | — | — | — |
+
+Decrements the accumulator by <var>X</var>.
+
+#### Skip
+
+Mnemonic: `skip#`<br>
+Opcode: `0100 10xx` (`0x48`–`0x4B`)
+
+| A |   P   | h | t | c | o |
+|:-:|:-----:|:-:|:-:|:-:|:-:|
+| — | P + X | — | — | — | — |
+
+Increments the program counter by <var>X</var> + 1.
+
+#### Conditional skip
+
+Mnemonic: `cskip#`<br>
+Opcode: `0100 11xx` (`0x4C`–`0x4F`)
+
+| A | P  | h | t | c | o |
+|:-:|:--:|:-:|:-:|:-:|:-:|
+| — | \* | — | 0 | — | — |
+
+If the test flag is set, increments the program counter by <var>X</var> + 1
+instructions and clears the test flag. Otherwise the program counter is
+unaffected.
+
 #### Bitwise shifts
 
-**Mnemonic:** See description<br>
-**Opcode:** See description
+Mnemonic: See description<br>
+Opcode: `011a aaxx` (`0x6C`–`0x7F`)
 
 | A  | P | h | t | c  | o |
 |:--:|:-:|:-:|:-:|:--:|:-:|
 | \* | — | — | — | \* | — |
 
-This is a family of instructions that perform a bitwise shift on the
-accumulator.
+This is a family of instructions that perform a bitwise shift by <var>X</var>
+on the accumulator.
 
-| Mnemonic | Opcode | Description                                            |
+| Mnemonic | `aaa`  | Description                                            |
 |:--------:|:------:|:-------------------------------------------------------|
-| `ls`     |        | Left shift, filling LSB with `0`                       |
-| `lsc`    |        | Left shift, filling LSB with carry flag                |
-| `rsu`    |        | Unsigned (logical) right shift, filling MSB with `0`   |
-| `rsuc`   |        | Unsigned right shfit, filling MSB with carry flag      |
-| `rss`    |        | Signed (arithmetic) right shift, preserving MSB        |
+| `ls#`    | `011`  | Left shift, filling LSB with `0`                       |
+| `lsc#`   | `100`  | Left shift, filling LSB with carry flag                |
+| `rsu#`   | `101`  | Unsigned (logical) right shift, filling MSB with `0`   |
+| `rsuc#`  | `110`  | Unsigned right shfit, filling MSB with carry flag      |
+| `rss#`   | `111`  | Signed (arithmetic) right shift, preserving MSB        |
 
 The carry flag is set to the bit that gets shifted out of the accumulator.
 
@@ -179,8 +214,8 @@ each of the following instructions.
 
 #### Set (immediate only)
 
-**Mnemonic:** `set`<br>
-**Opcode:**
+Mnemonic: `set`<br>
+Opcode: `0x80`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -193,8 +228,8 @@ that role.
 
 #### Load
 
-**Mnemonic:** `load`(`m`)<br>
-**Opcode:**
+Mnemonic: `load`(`m`)<br>
+Opcodes: `1000 001m` (`0x82`/`0x83`)
 
 | A  | P | h | t | c | o |
 |:--:|:-:|:-:|:-:|:-:|:-:|
@@ -205,8 +240,8 @@ accumulator.
 
 #### Store
 
-**Mnemonic:** `store`(`m`)<br>
-**Opcode:**
+Mnemonic: `store`(`m`)<br>
+Opcodes: `1000 010m` (`0x84`/`0x85`)
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -217,8 +252,8 @@ address in memory.
 
 #### Jump
 
-**Mnemonic:** `jump`(`m`)<br>
-**Opcode:**
+Mnemonic: `jump`(`m`)<br>
+Opcodes: `1000 011m` (`0x86`/`0x87`)
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -226,10 +261,10 @@ address in memory.
 
 Sets the program counter to the given value.
 
-#### Conditional branch
+#### Conditional jump
 
-**Mnemonic:** `branch`(`m`)<br>
-**Opcode:**
+Mnemonic: `cjump`(`m`)<br>
+Opcodes: `1000 100m` (`0x88`/`0x89`)
 
 | A | P  | h | t | c | o |
 |:-:|:--:|:-:|:-:|:-:|:-:|
@@ -240,8 +275,8 @@ flag. Otherwise the program counter is unaffected.
 
 #### Arithmetic operations
 
-**Mnemonic:** See description<br>
-**Opcode:** See description
+Mnemonic: See description<br>
+Opcode: `1001 0aam` (`0x90`–`0x97`)
 
 | A  | P | h | t | c  | o  |
 |:--:|:-:|:-:|:-:|:--:|:--:|
@@ -250,20 +285,20 @@ flag. Otherwise the program counter is unaffected.
 This is a set of instructions that perform addition and subtraction on the
 accumulator.
 
-| Mnemonic    | Opcode | Description                                                |
+| Mnemonic    |  `aa`  | Description                                                |
 |:-----------:|:------:|:-----------------------------------------------------------|
-| `add`(`m`)  |        | <var>A</var> := <var>A</var> + <var>X</var>                |
-| `addc`(`m`) |        | <var>A</var> := <var>A</var> + <var>X</var> + <var>c</var> |
-| `sub`(`m`)  |        | <var>A</var> := <var>A</var> − <var>X</var>                |
-| `subc`(`m`) |        | <var>A</var> := <var>A</var> − <var>X</var> − <var>c</var> |
+| `add`(`m`)  |  `00`  | <var>A</var> := <var>A</var> + <var>X</var>                |
+| `addc`(`m`) |  `01`  | <var>A</var> := <var>A</var> + <var>X</var> + <var>c</var> |
+| `sub`(`m`)  |  `10`  | <var>A</var> := <var>A</var> − <var>X</var>                |
+| `subc`(`m`) |  `11`  | <var>A</var> := <var>A</var> − <var>X</var> − <var>c</var> |
 
 In all cases, the carry flag is set if an unsigned overflow occurs while the
 signed overflow flag is set if a signed overflow occurs.
 
 #### Bitwise operations
 
-**Mnemonic:** See description<br>
-**Opcode:**
+Mnemonic: See description<br>
+Opcode: `1001 1aam` (`0x98`–`0x9D`)
 
 | A  | P | h | t | c | o |
 |:--:|:-:|:-:|:-:|:-:|:-:|
@@ -272,16 +307,16 @@ signed overflow flag is set if a signed overflow occurs.
 This is a set of instructions that perform bitwise operations on the
 accumulator.
 
-| Mnemonic   | Opcode | Description                                    |
+| Mnemonic   |  `aa`  | Description                                    |
 |:----------:|:------:|:-----------------------------------------------|
-| `and`(`m`) |        | <var>A</var> := <var>A</var> AND <var>X</var>  |
-| `or`(`m`)  |        | <var>A</var> := <var>A</var> OR <var>X</var>   |
-| `xor`(`m`) |        | <var>A</var> := <var>A</var> XOR <var>X</var>  |
+| `and`(`m`) |  `00`  | <var>A</var> := <var>A</var> AND <var>X</var>  |
+| `or`(`m`)  |  `01`  | <var>A</var> := <var>A</var> OR <var>X</var>   |
+| `xor`(`m`) |  `10`  | <var>A</var> := <var>A</var> XOR <var>X</var>  |
 
 #### Comparisons
 
-**Mnemonic:** See description<br>
-**Opcode:** See description
+Mnemonic: See description<br>
+Opcode: `1010 aaam` (`0xA0`–`0xA9`)
 
 | A | P | h | t  | c | o |
 |:-:|:-:|:-:|:--:|:-:|:-:|
@@ -290,10 +325,10 @@ accumulator.
 This is a set of instructions that perform a comparison and set the test flag
 if true.
 
-| Mnemonic    | Opcode | Comparison                                 |
+| Mnemonic    | `aaa`  | Comparison                                 |
 |:-----------:|:------:|:-------------------------------------------|
-| `teq`(`m`)  |        | <var>A</var> = <var>X</var>                |
-| `tgtu`(`m`) |        | <var>A</var> > <var>X</var> (unsigned)     |
-| `tgts`(`m`) |        | <var>A</var> > <var>X</var> (signed)       |
-| `tltu`(`m`) |        | <var>A</var> \< <var>X</var> (unsigned)    |
-| `tlts`(`m`) |        | <var>A</var> \< <var>X</var> (signed)      |
+| `tgtu`(`m`) | `000`  | <var>A</var> > <var>X</var> (unsigned)     |
+| `tgts`(`m`) | `001`  | <var>A</var> > <var>X</var> (signed)       |
+| `tltu`(`m`) | `010`  | <var>A</var> \< <var>X</var> (unsigned)    |
+| `tlts`(`m`) | `011`  | <var>A</var> \< <var>X</var> (signed)      |
+| `teq`(`m`)  | `100`  | <var>A</var> = <var>X</var>                |
