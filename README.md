@@ -223,7 +223,7 @@ Opcodes: `0x80`
 
 Sets the accumulator to the given value.
 
-This instruction does not have a direct mode. The `load` instructions fulfils
+This instruction does not have a direct mode. The `load` instruction fulfils
 that role.
 
 #### Load
