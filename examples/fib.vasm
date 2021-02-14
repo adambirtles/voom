@@ -2,7 +2,7 @@
 
         load $N         ; if N < 2
         tlt 0x0002
-        branch $triv    ; then goto triv
+        cjump $triv     ; then goto triv
 
         load $i
         jump $test
@@ -21,7 +21,7 @@ loop:   load $result    ; temp = result
         store $i
 
 test:   tlt $N          ; if i < n
-        branch $loop    ; then goto loop
+        cjump $loop     ; then goto loop
         jump $done      ; else goto done
 
 triv:   store $result   ; result = N
