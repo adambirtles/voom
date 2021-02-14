@@ -47,7 +47,7 @@ each implicit instruction.
 #### No-op
 
 Mnemonic: `nop`<br>
-Opcode: `0x00`
+Opcodes: `0x00`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -58,7 +58,7 @@ Does nothing.
 #### Test carry
 
 Mnemonic: `tc`<br>
-Opcode: `0x01`
+Opcodes: `0x01`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -69,7 +69,7 @@ Checks if the carry flag is set.
 #### Test signed overflow
 
 Mnemonic: `to`<br>
-Opcode: `0x02`
+Opcodes: `0x02`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -80,7 +80,7 @@ Checks if the signed overflow flag is set.
 #### Invert test
 
 Mnemonic: `inv`<br>
-Opcode: `0x03`
+Opcodes: `0x03`
 
 | A | P | h | t  | c | o |
 |:-:|:-:|:-:|:--:|:-:|:-:|
@@ -91,7 +91,7 @@ Inverts the test flag, working as a NOT operation on the previous test.
 #### Bitwise NOT
 
 Mnemonic: `not`<br>
-Opcode: `0x04`
+Opcodes: `0x04`
 
 | A  | P | h | t | c | o |
 |:--:|:-:|:-:|:-:|:-:|:-:|
@@ -102,7 +102,7 @@ Performs a bitwise NOT on the accumulator.
 #### Negate
 
 Mnemonic: `neg`<br>
-Opcode: `0x05`
+Opcodes: `0x05`
 
 | A  | P | h | t | c | o |
 |:--:|:-:|:-:|:-:|:-:|:-:|
@@ -113,7 +113,7 @@ Converts the accumulator to its two's complement negative.
 #### Halt
 
 Mnemonic: `halt`<br>
-Opcode: `0x3F`
+Opcodes: `0x3F`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -156,7 +156,7 @@ Decrements the accumulator by <var>X</var>.
 #### Skip
 
 Mnemonic: `skip#`<br>
-Opcode: `0100 10xx` (`0x48`–`0x4B`)
+Opcodes: `0100 10xx` (`0x48`–`0x4B`)
 
 | A |   P   | h | t | c | o |
 |:-:|:-----:|:-:|:-:|:-:|:-:|
@@ -167,7 +167,7 @@ Increments the program counter by <var>X</var> + 1.
 #### Conditional skip
 
 Mnemonic: `cskip#`<br>
-Opcode: `0100 11xx` (`0x4C`–`0x4F`)
+Opcodes: `0100 11xx` (`0x4C`–`0x4F`)
 
 | A | P  | h | t | c | o |
 |:-:|:--:|:-:|:-:|:-:|:-:|
@@ -180,7 +180,7 @@ unaffected.
 #### Bitwise shifts
 
 Mnemonic: See description<br>
-Opcode: `011a aaxx` (`0x6C`–`0x7F`)
+Opcodes: `011a aaxx` (`0x6C`–`0x7F`)
 
 | A  | P | h | t | c  | o |
 |:--:|:-:|:-:|:-:|:--:|:-:|
@@ -215,7 +215,7 @@ each of the following instructions.
 #### Set (immediate only)
 
 Mnemonic: `set`<br>
-Opcode: `0x80`
+Opcodes: `0x80`
 
 | A | P | h | t | c | o |
 |:-:|:-:|:-:|:-:|:-:|:-:|
@@ -276,7 +276,7 @@ flag. Otherwise the program counter is unaffected.
 #### Arithmetic operations
 
 Mnemonic: See description<br>
-Opcode: `1001 0aam` (`0x90`–`0x97`)
+Opcodes: `1001 0aam` (`0x90`–`0x97`)
 
 | A  | P | h | t | c  | o  |
 |:--:|:-:|:-:|:-:|:--:|:--:|
@@ -298,7 +298,7 @@ signed overflow flag is set if a signed overflow occurs.
 #### Bitwise operations
 
 Mnemonic: See description<br>
-Opcode: `1001 1aam` (`0x98`–`0x9D`)
+Opcodes: `1001 1aam` (`0x98`–`0x9D`)
 
 | A  | P | h | t | c | o |
 |:--:|:-:|:-:|:-:|:-:|:-:|
@@ -316,7 +316,7 @@ accumulator.
 #### Comparisons
 
 Mnemonic: See description<br>
-Opcode: `1010 aaam` (`0xA0`–`0xA9`)
+Opcodes: `1010 aaam` (`0xA0`–`0xA9`)
 
 | A | P | h | t  | c | o |
 |:-:|:-:|:-:|:--:|:-:|:-:|
