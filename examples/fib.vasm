@@ -1,9 +1,9 @@
 ; Find the Nth fibonacci number
 
         load $N         ; if N < 2
-        tlt 2
+        tlt 0x0002
         branch $triv    ; then goto triv
-        
+
         load $i
         jump $test
 
@@ -27,8 +27,8 @@ test:   tlt $N          ; if i < n
 triv:   store $result   ; result = N
 done:   halt
 
-N:      .16 10
-result: .16 0
-prev:   .16 1
-i:      .16 2
-temp:   .16 0
+N:      0x000A // 10
+result: 0x0000
+prev:   0x0001
+i:      0x0002
+temp:   0x0000
