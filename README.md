@@ -10,102 +10,287 @@ Memory is byte-addressable with 16-bit addresses.
 
 There are two 16-bit registers:
 
-- Accumulator (_A_)
-- Program counter (_P_)
+- Accumulator (<var>A</var>)
+- Program counter (<var>P</var>)
 
 ## Status flags
 
-- Halt (_h_)
-- Test (_t_)
-- Carry (_c_)
-- Signed overflow (_o_)
+- Halt (<var>h</var>)
+- Test (<var>t</var>)
+- Carry (<var>c</var>)
+- Signed overflow (<var>o</var>)
 
 ## Instructions
 
-Instructions are made up of a 1-byte opcode, and zero or one 2-byte operands. An
-instruction that has no operand is known as **implicit**. All instructions with
-operands (except `set`) have two modes:
+Instructions are made up of a 1-byte opcode, and zero or one 2-byte operands.
 
-- **Immediate:** the intruction operand is the relevant value
-- **Direct:** the instruction operand points to the relevant value in memory
+| Opcode bits | Category                                        | Operands |
+|:-----------:|:------------------------------------------------|:--------:|
+| `00__ ____` | Implicit                                        | 0        |
+| `1m__ ____` | Immediate (`m` = `0`) and direct (`m` = `1`)    | 1        |
 
-The mnemonic for the direct version of an instruction is append with `m` (e.g.
-immediate `add` and direct `addm`). In the descriptions of instructions below,
-the relevant value is referred to as _X_.
+Any unlisted opcodes are undefined and reserved for future use.
 
-The `set` instruction only has an immediate mode since a `setm` would be
-equivalent to `load`.
+The key for symbols in the tables below:
 
-Instructions cause the program counter to increment counter unless they set the
-program counter, by 1 if they're implicit and by 3 if they're immediate or
-direct.
-
-
-### Control
-
-#### Implicit
-
-| Mnemonic | Description        |
-|:---------|:-------------------|
-| `nop`    | Do nothing         |
-| `halt`   | Set _h_            |
-| `tc`     | Test if _c_ is set |
-| `to`     | Test if _o_ is set |
-| `nott`   | Invert _t_         |
-
-
-#### Immediate/direct
-
-| Mnemonic | Description                  |
-|:---------|:-----------------------------|
-| `jump`   | Set _P_ to _X_               |
-| `branch` | Set _P_ to _X_ if _t_ is set |
-
-### Memory interaction
-
-#### Immediate
-
-| Mnemonic | Description    |
-|:---------|:---------------|
-| `set`    | Set _A_ to _X_ |
-
-#### Immediate/direct
-
-| Mnemonic | Description                            |
-|:---------|:---------------------------------------|
-| `load`   | Load the given memory address into _A_ |
-| `store`  | Store _A_ at the given address         |
-
-### Arithmatic and logic
+| Symbol | Meaning      |
+|:------:|:-------------|
+| —      | Not affected |
+| \*     | As described |
 
 ### Implicit
 
-| Mnemonic | Description                                      |
-|:---------|:-------------------------------------------------|
-| `inc`    | Increment _A_                                    |
-| `dec`    | Decrement _A_                                    |
-| `not`    | Bitwise NOT _A_                                  |
-| `neg`    | Two's complement negate _A_                      |
-| `shl`    | Left shift _A_                                   |
-| `shlc`   | Left shift _A_, using carry                      |
-| `shru`   | Unsigned (logical) right shift _A_               |
-| `shruc`  | Unsigned (logical) right shift _A_, using carry  |
-| `shrs`   | Signed (arithmetic) right shift _A_              |
-| `shrsc`  | Signed (arithmetic) right shift _A_, using carry |
+Unless it's affected by the instruction, <var>P</var> is increased by 1 after
+each implicit instruction.
 
-### Immediate/direct
+#### No-op
 
-| Mnemonic | Description                                |
-|:---------|:-------------------------------------------|
-| `add`    | Add _X_ to _A_                             |
-| `addc`   | Add _X_ to _A_, using carry                |
-| `sub`    | Subtract _X_ from _A_                      |
-| `subc`   | Subtract _X_ from _A_, using carry         |
-| `and`    | Bitwise AND _X_ with _A_                   |
-| `or`     | Bitwise OR _X_ with _A_                    |
-| `xor`    | Bitwise XOR _X_ with _A_                   |
-| `teq`    | Test if _A_ is equal to _X_                |
-| `tgtu`   | Test if _A_ is greater than _X_ (unsigned) |
-| `tgts`   | Test if _A_ is greater than _X_ (signed)   |
-| `tltu`   | Test if _A_ is less than _X_ (unsigned)    |
-| `tlts`   | Test if _A_ is less than _X_ (signed)      |
+**Mnemonic:** `nop`<br>
+**Opcode:**
+
+| A | P | h | t | c | o |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| — | — | — | — | — | — |
+
+Does nothing.
+
+#### Halt
+
+**Mnemonic:** `halt`<br>
+**Opcode:**
+
+| A | P | h | t | c | o |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| — | — | 1 | — | — | — |
+
+Set the halt flag, halting execution of the program.
+
+#### Test carry
+
+**Mnemonic:** `tc`<br>
+**Opcode:**
+
+| A | P | h | t | c | o |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| — | — | — | c | — | — |
+
+Checks if the carry flag is set.
+
+#### Test signed overflow
+
+**Mnemonic:** `to`<br>
+**Opcode:**
+
+| A | P | h | t | c | o |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| — | — | — | o | — | — |
+
+Checks if the signed overflow flag is set.
+
+#### Invert test
+
+**Mnemonic:** `inv`<br>
+**Opcode:**
+
+| A | P | h | t  | c | o |
+|:-:|:-:|:-:|:--:|:-:|:-:|
+| — | — | — | !t | — | — |
+
+Inverts the test flag, working as a NOT operation on the previous test.
+
+#### Increment
+
+**Mnemonic:** `inc`<br>
+**Opcode:**
+
+|   A   | P | h | t | c | o |
+|:-----:|:-:|:-:|:-:|:-:|:-:|
+| A + 1 | — | — | — | — | — |
+
+Increments the accumulator.
+
+#### Decrement
+
+**Mnemonic:** `dec`<br>
+**Opcode:**
+
+|   A   | P | h | t | c | o |
+|:-----:|:-:|:-:|:-:|:-:|:-:|
+| A − 1 | — | — | — | — | — |
+
+Decrements the accumulator.
+
+#### Bitwise NOT
+
+**Mnemonic:** `not`<br>
+**Opcode:**
+
+| A  | P | h | t | c | o |
+|:--:|:-:|:-:|:-:|:-:|:-:|
+| !A | — | — | — | — | — |
+
+Performs a bitwise NOT on the accumulator.
+
+#### Negate
+
+**Mnemonic:** `neg`<br>
+**Opcode:**
+
+| A  | P | h | t | c | o |
+|:--:|:-:|:-:|:-:|:-:|:-:|
+| −A | — | — | — | — | — |
+
+Converts the accumulator to its two's complement negative.
+
+#### Bitwise shifts
+
+**Mnemonic:** See description<br>
+**Opcode:** See description
+
+| A  | P | h | t | c  | o |
+|:--:|:-:|:-:|:-:|:--:|:-:|
+| \* | — | — | — | \* | — |
+
+This is a family of instructions that perform a bitwise shift on the
+accumulator.
+
+| Mnemonic | Opcode | Description                                            |
+|:--------:|:------:|:-------------------------------------------------------|
+| `ls`     |        | Left shift, filling LSB with `0`                       |
+| `lsc`    |        | Left shift, filling LSB with carry flag                |
+| `rsu`    |        | Unsigned (logical) right shift, filling MSB with `0`   |
+| `rsuc`   |        | Unsigned right shfit, filling MSB with carry flag      |
+| `rss`    |        | Signed (arithmetic) right shift, preserving MSB        |
+
+The carry flag is set to the bit that gets shifted out of the accumulator.
+
+### Immediate and Direct
+
+In the following instructions, the value of <var>X</var> depends on its mode:
+
+- Immediate: <var>X</var> is the two-byte operand following the instruction.
+- Direct: The operand is a pointer to <var>X</var> in memory.
+
+Unless it's affected by the instruction, <var>P</var> is increased by 3 after
+each of the folowing instructions.
+
+#### Set (immediate only)
+
+**Mnemonic:** `set`<br>
+**Opcode:**
+
+| A | P | h | t | c | o |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| X | — | — | — | — | — |
+
+Sets the accumulator to the given value.
+
+This instruction does not have a direct mode. The `load` instructions fulfils
+that role.
+
+#### Load
+
+**Mnemonic:** `load`(`m`)<br>
+**Opcode:**
+
+| A  | P | h | t | c | o |
+|:--:|:-:|:-:|:-:|:-:|:-:|
+| \* | — | — | — | — | — |
+
+Loads the two bytes starting at the given address in memory into the
+accumulator.
+
+#### Store
+
+**Mnemonic:** `store`(`m`)<br>
+**Opcode:**
+
+| A | P | h | t | c | o |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| — | — | — | — | — | — |
+
+Stores the value in the accumulator in the two bytes starting at the given
+address in memory.
+
+#### Jump
+
+**Mnemonic:** `jump`(`m`)<br>
+**Opcode:**
+
+| A | P | h | t | c | o |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| — | X | — | — | — | — |
+
+Sets the program counter to the given value.
+
+#### Conditional branch
+
+**Mnemonic:** `branch`(`m`)<br>
+**Opcode:**
+
+| A | P  | h | t | c | o |
+|:-:|:--:|:-:|:-:|:-:|:-:|
+| — | \* | — | 0 | — | — |
+
+If the test flag is set, jumps to the given location and clears the test
+flag. Otherwise the program counter is unaffected.
+
+#### Arithmetic operations
+
+**Mnemonic:** See description<br>
+**Opcode:** See description
+
+| A  | P | h | t | c  | o  |
+|:--:|:-:|:-:|:-:|:--:|:--:|
+| \* | — | — | — | \* | \* |
+
+This is a set of instructions that perform addition and subtraction on the
+accumulator.
+
+| Mnemonic    | Opcode | Description                                                |
+|:-----------:|:------:|:-----------------------------------------------------------|
+| `add`(`m`)  |        | <var>A</var> := <var>A</var> + <var>X</var>                |
+| `addc`(`m`) |        | <var>A</var> := <var>A</var> + <var>X</var> + <var>c</var> |
+| `sub`(`m`)  |        | <var>A</var> := <var>A</var> − <var>X</var>                |
+| `subc`(`m`) |        | <var>A</var> := <var>A</var> − <var>X</var> − <var>c</var> |
+
+In all cases, the carry flag is set if an unsigned overflow occurs while the
+signed overflow flag is set if a signed overflow occurs.
+
+#### Bitwise operations
+
+**Mnemonic:** See description<br>
+**Opcode:**
+
+| A  | P | h | t | c | o |
+|:--:|:-:|:-:|:-:|:-:|:-:|
+| \* | — | — | — | — | — |
+
+This is a set of instructions that perform bitwise operations on the
+accumulator.
+
+| Mnemonic   | Opcode | Description                                    |
+|:----------:|:------:|:-----------------------------------------------|
+| `and`(`m`) |        | <var>A</var> := <var>A</var> AND <var>X</var>  |
+| `or`(`m`)  |        | <var>A</var> := <var>A</var> OR <var>X</var>   |
+| `xor`(`m`) |        | <var>A</var> := <var>A</var> XOR <var>X</var>  |
+
+#### Comparisons
+
+**Mnemonic:** See description<br>
+**Opcode:** See description
+
+| A | P | h | t  | c | o |
+|:-:|:-:|:-:|:--:|:-:|:-:|
+| — | — | — | \* | — | — |
+
+This is a set of instructions that perform a comparison and set the test flag
+if true.
+
+| Mnemonic    | Opcode | Comparison                                 |
+|:-----------:|:------:|:-------------------------------------------|
+| `teq`(`m`)  |        | <var>A</var> = <var>X</var>                |
+| `tgtu`(`m`) |        | <var>A</var> > <var>X</var> (unsigned)     |
+| `tgts`(`m`) |        | <var>A</var> > <var>X</var> (signed)       |
+| `tltu`(`m`) |        | <var>A</var> \< <var>X</var> (unsigned)    |
+| `tlts`(`m`) |        | <var>A</var> \< <var>X</var> (signed)      |
