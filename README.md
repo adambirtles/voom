@@ -189,13 +189,13 @@ Opcodes: `011a aaxx` (`0x6C`–`0x7F`)
 This is a family of instructions that perform a bitwise shift by <var>X</var>
 on the accumulator.
 
-| Mnemonic | `aaa`  | Description                                            |
+| Mnemonic | Opcode | Description                                            |
 |:--------:|:------:|:-------------------------------------------------------|
-| `ls#`    | `011`  | Left shift, filling LSB with `0`                       |
-| `lsc#`   | `100`  | Left shift, filling LSB with carry flag                |
-| `rsu#`   | `101`  | Unsigned (logical) right shift, filling MSB with `0`   |
-| `rsuc#`  | `110`  | Unsigned right shfit, filling MSB with carry flag      |
-| `rss#`   | `111`  | Signed (arithmetic) right shift, preserving MSB        |
+| `ls#`    | `0x6C` | Left shift, filling LSB with `0`                       |
+| `lsc#`   | `0x70` | Left shift, filling LSB with carry flag                |
+| `rsu#`   | `0x74` | Unsigned (logical) right shift, filling MSB with `0`   |
+| `rsuc#`  | `0x78` | Unsigned right shfit, filling MSB with carry flag      |
+| `rss#`   | `0x7C` | Signed (arithmetic) right shift, preserving MSB        |
 
 The carry flag is set to the bit that gets shifted out of the accumulator.
 
@@ -285,12 +285,12 @@ Opcodes: `1001 0aam` (`0x90`–`0x97`)
 This is a set of instructions that perform addition and subtraction on the
 accumulator.
 
-| Mnemonic    |  `aa`  | Description                                                |
+| Mnemonic    | Opcode | Description                                                |
 |:-----------:|:------:|:-----------------------------------------------------------|
-| `add`(`m`)  |  `00`  | <var>A</var> := <var>A</var> + <var>X</var>                |
-| `addc`(`m`) |  `01`  | <var>A</var> := <var>A</var> + <var>X</var> + <var>c</var> |
-| `sub`(`m`)  |  `10`  | <var>A</var> := <var>A</var> − <var>X</var>                |
-| `subc`(`m`) |  `11`  | <var>A</var> := <var>A</var> − <var>X</var> − <var>c</var> |
+| `add`(`m`)  | `0x90` | <var>A</var> := <var>A</var> + <var>X</var>                |
+| `addc`(`m`) | `0x92` | <var>A</var> := <var>A</var> + <var>X</var> + <var>c</var> |
+| `sub`(`m`)  | `0x94` | <var>A</var> := <var>A</var> − <var>X</var>                |
+| `subc`(`m`) | `0x96` | <var>A</var> := <var>A</var> − <var>X</var> − <var>c</var> |
 
 In all cases, the carry flag is set if an unsigned overflow occurs while the
 signed overflow flag is set if a signed overflow occurs.
@@ -307,11 +307,11 @@ Opcodes: `1001 1aam` (`0x98`–`0x9D`)
 This is a set of instructions that perform bitwise operations on the
 accumulator.
 
-| Mnemonic   |  `aa`  | Description                                    |
+| Mnemonic   | Opcode | Description                                    |
 |:----------:|:------:|:-----------------------------------------------|
-| `and`(`m`) |  `00`  | <var>A</var> := <var>A</var> AND <var>X</var>  |
-| `or`(`m`)  |  `01`  | <var>A</var> := <var>A</var> OR <var>X</var>   |
-| `xor`(`m`) |  `10`  | <var>A</var> := <var>A</var> XOR <var>X</var>  |
+| `and`(`m`) | `0x98` | <var>A</var> := <var>A</var> AND <var>X</var>  |
+| `or`(`m`)  | `0x9A` | <var>A</var> := <var>A</var> OR <var>X</var>   |
+| `xor`(`m`) | `0x9C` | <var>A</var> := <var>A</var> XOR <var>X</var>  |
 
 #### Comparisons
 
@@ -325,10 +325,10 @@ Opcodes: `1010 aaam` (`0xA0`–`0xA9`)
 This is a set of instructions that perform a comparison and set the test flag
 if true.
 
-| Mnemonic    | `aaa`  | Comparison                                 |
+| Mnemonic    | Opcode | Comparison                                 |
 |:-----------:|:------:|:-------------------------------------------|
-| `tgtu`(`m`) | `000`  | <var>A</var> > <var>X</var> (unsigned)     |
-| `tgts`(`m`) | `001`  | <var>A</var> > <var>X</var> (signed)       |
-| `tltu`(`m`) | `010`  | <var>A</var> \< <var>X</var> (unsigned)    |
-| `tlts`(`m`) | `011`  | <var>A</var> \< <var>X</var> (signed)      |
-| `teq`(`m`)  | `100`  | <var>A</var> = <var>X</var>                |
+| `tgtu`(`m`) | `0xA0` | <var>A</var> > <var>X</var> (unsigned)     |
+| `tgts`(`m`) | `0xA2` | <var>A</var> > <var>X</var> (signed)       |
+| `tltu`(`m`) | `0xA4` | <var>A</var> \< <var>X</var> (unsigned)    |
+| `tlts`(`m`) | `0xA6` | <var>A</var> \< <var>X</var> (signed)      |
+| `teq`(`m`)  | `0xA8` | <var>A</var> = <var>X</var>                |
