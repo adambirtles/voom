@@ -1,0 +1,11 @@
+[package]
+name = "voom"
+version = "0.1.0"
+authors = ["Adam Birtles <adam@adambirtles.com>"]
+edition = "2018"
+
+[[bin]]
+name = "voom"
+path = "src/main.rs"
+
+[dependencies]
