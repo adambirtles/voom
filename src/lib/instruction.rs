@@ -9,7 +9,7 @@ pub enum ImplicitOp {
 }
 
 impl ImplicitOp {
-    pub fn from_opcode(opcode: u8) -> Option<ImplicitOp> {
+    fn from_opcode(opcode: u8) -> Option<ImplicitOp> {
         use ImplicitOp::*;
         match opcode {
             0x00 => Some(NoOp),
@@ -37,7 +37,7 @@ pub enum CompactOp {
 }
 
 impl CompactOp {
-    pub fn from_opcode(opcode: u8) -> Option<CompactOp> {
+    fn from_opcode(opcode: u8) -> Option<CompactOp> {
         use CompactOp::*;
         match opcode & 0b1111_1100 {
             0x40 => Some(Increment),
@@ -73,7 +73,7 @@ pub enum OperandedOp {
 }
 
 impl OperandedOp {
-    pub fn from_opcode(opcode: u8) -> Option<OperandedOp> {
+    fn from_opcode(opcode: u8) -> Option<OperandedOp> {
         use OperandedOp::*;
 
         if opcode == 0x81 {

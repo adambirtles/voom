@@ -1,7 +1,6 @@
-mod instruction;
-mod machine;
+extern crate voom;
 
-use machine::{Machine, Memory};
+use voom::machine::{Machine, Memory};
 
 const ROM: [u8; 4] = [
     0x80, 0x03, 0x15,   // set 0x0315 ; 789
